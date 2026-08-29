@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackOut</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>BlackOut</h1>
+
+    <div class="container" id="login" style="display: flex;">
+        <label for="uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter username" id="uname" name="uname">
+
+        <label for="mail"><b>mail</b></label>
+        <input type="email" placeholder="Enter email" id="mail" name="mail">
+        
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" id="password" name="psw">
+        
+        <button type="button" id="login-btn">Login</button>
+        <label>
+            <input type="checkbox" checked="checked" name="remember"> Remember me
+        </label>
+    </div>
+    
+    <div class="container" id="chat" style="display: none;">
+        <div class="chat-inner-wrapper">
+
+            <div class="rooms">
+                <h3>Moje chaty 💬</h3>
+                <div id="roomsList">
+                    <!-- Sem se vypíšou místnosti -->
+                </div>
+                
+                <div class="rooms-footer">
+                    <button id="add-room-btn" class="features" title="Nová zpráva">➕</button>
+                    <button id="settings-btn" class="features" title="Nastavení">⚙️</button>
+                </div>
+            </div>
+
+            <div class="chats">
+                <div class="chat-header">
+                    <button id="back-to-rooms-btn">←</button>
+                    <h3 id="currentRoomTitle">Vyber chat</h3>
+                </div>
+
+                <!-- Seznam zpráv -->
+                <div class="messages" id="messagesList">
+                </div>
+
+                <!-- Formulář na zprávy -->
+                <form id="messageForm">
+                    <input type="text" id="messageInput" placeholder="Napiš zprávu..." autocomplete="off">
+                    <button class="send-btn" type="submit">Odeslat</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+<!-- Modální okno - Nastavení -->
+<div id="settings-modal" class="modal hidden">
+    <div class="modal-content settings-content">
+        <div class="settings-header">
+            <h2>Nastavení</h2>
+            <button id="close-settings-btn" class="icon-btn">✖</button>
+        </div>
+        
+        <div class="settings-scroll-area">
+            <!-- Sekce Profil -->
+            <div class="settings-section">
+                <h3>👤 Můj profil</h3>
+                <p class="settings-info">Přihlášen jako: <br><strong id="settings-email">...</strong></p>
+                <label>Uživatelské jméno:</label>
+                <div class="input-group">
+                    <input type="text" id="settings-username-input" placeholder="Tvé jméno...">
+                </div>
+            </div>
+
+            <!-- Sekce Vzhled -->
+            <div class="settings-section">
+                <h3>🎨 Vzhled chatu</h3>
+                <label>Hlavní barva:</label>
+                <div class="color-picker-group">
+                    <button class="color-btn" style="background: #61E786;" data-color="#61E786"></button> <!-- Zelená -->
+                    <button class="color-btn" style="background: #4D96FF;" data-color="#4D96FF"></button> <!-- Modrá -->
+                    <button class="color-btn" style="background: #9D4EDD;" data-color="#9D4EDD"></button> <!-- Fialová -->
+                    <button class="color-btn" style="background: #FF6B6B;" data-color="#FF6B6B"></button> <!-- Červená -->
+                    <button class="color-btn" style="background: #F9C74F;" data-color="#F9C74F"></button> <!-- Žlutá -->
+                </div>
+            </div>
+
+            <!-- Sekce Účet -->
+            <div class="settings-section">
+                <h3>⚙️ Účet</h3>
+                <button id="logout-btn" class="danger-btn">Odhlásit se</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Container (okno) pro vytvoření nového soukromého chatu (➕) -->
+    <div id="add-room-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Nový soukromý chat</h3>
+            <p style="font-size: 0.9rem; color: #aaa;">Zadej uživatelské jméno:</p>
+            
+            <input type="text" id="search-username-input" placeholder="Uživatelské jméno..." autocomplete="off">
+            
+            <button id="create-dm-btn">Vytvořit chat</button>
+            <button id="close-add-room-btn">Zavřít</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Systémové soubory (Mac / Windows)
+.DS_Store
+Thumbs.db
+
+# Složky s balíčky (kdyby jsi někdy používal Node.js)
+node_modules/
+
+# Citlivé konfigurační soubory
+.env

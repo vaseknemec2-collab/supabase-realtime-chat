@@ -1,0 +1,551 @@
+:root {
+    --background: #F5EFED;
+    --primary: #61E786;
+    --secondary: #273043;
+    --text_color: #301934;
+    --container-bg: #E3EEF4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+h1 {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white;
+    color: var(--text_color);
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* --- LOGIN CONTAINER --- */
+.container {
+    padding: 30px;
+    width: 320px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    background: var(--container-bg);
+    border-radius: 15px;
+    border: var(--secondary) solid 2px;
+}
+
+/* --- CHAT CONTAINER (NA PC) --- */
+#chat.container {
+    width: 800px !important;
+    max-width: 95vw;
+    height: 75vh !important;
+    padding: 15px !important;
+}
+
+.chat-inner-wrapper {
+    display: flex; 
+    height: 100%; 
+    gap: 20px;
+    position: relative;
+    width: 100%;
+}
+
+input {
+    padding: 10px;
+    border-radius: 15px;
+    border: #042a2b solid 1px;
+}
+
+button {
+    padding: 10px 20px;
+    border-radius: 15px;
+    background-color: var(--primary);
+    border: var(--secondary) solid 1px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* --- LEVÝ PANEL (MÍSTNOSTI) --- */
+.rooms {
+    width: 250px; 
+    background: #222; 
+    color: white; 
+    padding: 15px; 
+    border-radius: 8px; 
+    display: flex; 
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 60px;
+    flex-shrink: 0;
+}
+
+.rooms h3 {
+    margin-top: 0;
+}
+
+#roomsList {
+    flex-grow: 1; 
+    overflow-y: auto; 
+    margin-top: 10px;
+}
+
+.rooms-footer {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    left: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-item {
+    padding: 12px 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: #2a2a2a;
+    color: white;
+    font-size: 1rem;
+    transition: 0.2s ease;
+}
+
+.room-item:hover {
+    background: #3a3a3a;
+    transform: translateX(3px);
+}
+
+/* --- PRAVÝ PANEL (CHAT) --- */
+.chats {
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    background: #1a1a1a; 
+    color: white; 
+    padding: 15px; 
+    border-radius: 8px;
+    min-width: 0;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #444; 
+    padding-bottom: 10px; 
+    margin-bottom: 10px;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.messages {
+    flex-grow: 1; 
+    overflow-y: auto; 
+    padding-right: 5px; 
+    margin-bottom: 10px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px;
+}
+
+.message-bubble {
+    background: #222;
+    padding: 10px 14px;
+    border-radius: 8px;
+    word-break: break-word;
+    color: white;
+}
+
+.message-author {
+    color: var(--primary);
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+form {
+    display: flex; 
+    gap: 10px;
+}
+
+#messageInput {
+    flex-grow: 1; 
+    padding: 10px; 
+    border-radius: 6px; 
+    border: 1px solid #555; 
+    background: #222; 
+    color: white;
+}
+
+.send-btn {
+    padding: 10px 15px; 
+    background: #61E786; 
+    border: none; 
+    border-radius: 6px; 
+    font-weight: bold; 
+    cursor: pointer;
+}
+
+/* --- IKONY DOLE --- */
+.features {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: 0.2s;
+    color: white;
+}
+
+.features:hover {
+    transform: scale(1.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#settings-btn:hover {
+    transform: scale(1.2) rotate(45deg);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- MODÁLNÍ OKNA --- */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    color: white;
+}
+
+#logout-btn {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#logout-btn:hover {
+    background: #ff3333;
+    transform: scale(1.05);
+}
+
+#close-settings-btn, #close-add-room-btn {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#close-settings-btn:hover, #close-add-room-btn:hover {
+    background: #555;
+    transform: scale(1.05);
+}
+
+.hidden {
+    display: none !important;
+}
+
+#back-to-rooms-btn {
+    display: none;
+}
+
+.message-bubble {
+    position: relative;
+    padding-bottom: 22px; /* Necháme dole v bublině místo pro čas, aby nepřekryl text */
+}
+
+.message-time {
+    position: absolute;
+    bottom: 6px;
+    right: 12px;
+    font-size: 0.65rem;
+    color: #888; /* Jemná šedá barva */
+    user-select: none;
+}
+
+/* --- ROZŠÍŘENÉ NASTAVENÍ --- */
+.settings-content {
+    width: 350px !important;
+    max-height: 85vh;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #252525;
+    border-bottom: 1px solid #333;
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.icon-btn:hover {
+    color: white;
+    transform: scale(1.1);
+}
+
+.settings-scroll-area {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.settings-section {
+    background: #222;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.settings-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: var(--primary);
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+}
+
+.settings-info {
+    font-size: 0.9rem;
+    color: #bbb;
+    margin-bottom: 15px;
+    word-break: break-all;
+}
+
+.input-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 8px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 6px;
+}
+
+.action-btn {
+    background: var(--primary);
+    color: #111;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.color-picker-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.color-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 0;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.active {
+    border: 2px solid white;
+    transform: scale(1.1);
+}
+
+.danger-btn {
+    width: 100%;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.danger-btn:hover {
+    background: #ff3333;
+}
+
+/* --- ČISTÁ MOBILNÍ APPKA (PŘES CELOU OBRAZOVKU, ŽÁDNÉ PŘETÉKÁNÍ, ČISTÁ ČERŇ) --- */
+@media (max-width: 768px) {
+    /* Když je uživatel přihlášený v chatu, schováme nadpis i bílé pozadí webu */
+    body:has(#chat[style*="display: flex"]) {
+        background-color: #121212 !important;
+    }
+
+    body:has(#chat[style*="display: flex"]) h1 {
+        display: none !important;
+    }
+
+    /* Chat se roztáhne na 100% výšky i šířky mobilu bez okrajů a rámečků */
+    #chat.container {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        padding: 0 !important;
+        background: #121212 !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+    }
+
+    .chat-inner-wrapper {
+        height: 100% !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        position: relative;
+    }
+
+    /* Obě části (seznam i chat) vyplní přesně plochu mobilu */
+    .rooms, .chats {
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        border-radius: 0 !important;
+        border: none !important;
+        background: #121212 !important;
+    }
+
+    .rooms {
+        z-index: 2;
+        transition: transform 0.3s ease;
+        padding: 12px;
+        padding-bottom: 70px; /* Místo pro spodní ikony */
+    }
+
+    .chats {
+        z-index: 1;
+        padding: 12px;
+    }
+
+    /* Přepínání stránek v mobilu */
+    #chat.mobile-chat-open .rooms {
+        transform: translateX(-100%);
+    }
+
+    #back-to-rooms-btn {
+        display: inline-block !important;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.4rem;
+        cursor: pointer;
+        margin-right: 12px;
+        padding: 0;
+    }
+}
+/* --- OPRAVA PŘETÉKÁNÍ TLAČÍTKA ODESLAT NA MOBILU --- */
+@media (max-width: 768px) {
+    .chats {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Formulář vyplní celou šířku a zabrání jakémukoliv přetečení */
+    .chats form {
+        display: flex;
+        width: 100% !important;
+        gap: 8px;
+        padding: 8px 0;
+        box-sizing: border-box;
+    }
+
+    /* Vstupní pole se roztáhne a zabere zbytek místa */
+    .chats form input[type="text"], 
+    .chats form #messageInput {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        min-width: 0 !important; /* Klíčové pro flexbox, aby textové pole nedrželo pevnou šířku */
+        padding: 10px;
+        font-size: 1rem;
+    }
+
+    /* Tlačítko odeslat se nikdy neroztáhne víc, než potřebuje text */
+    .chats form button.send-btn {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        padding: 10px 16px;
+        white-space: nowrap; /* Zabrání zalamování textu v tlačítku */
+    }
+}
