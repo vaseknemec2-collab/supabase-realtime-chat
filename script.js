@@ -1,7 +1,9 @@
+/* =================================================================ia
+   1. KONFIGURACE A INICIALIZACE SUPABASE
+================================================================== */
 const SUPABASE_URL = 'https://javdlvchwamtxjgxbtcx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Lm05BJdFdb77Y3HO_xKHSw_5-1b0OuY';
 
-// Přidali jsme třetí parametr s nastavením "auth", který vynutí uložení session
 const mySupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
         persistSession: true,
@@ -10,76 +12,89 @@ const mySupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY,
     }
 });
 
-// --- ELEMENTY ---
+
+/* ===================================================================
+   2. DOM ELEMENTY (CACHE)
+================================================================== */
+// Autentifikace a hlavní layout
 const loginBtn = document.getElementById('login-btn');
 const emailInput = document.getElementById('mail');
 const passwordInput = document.getElementById('password');
 const loginContainer = document.getElementById('login');
 const chatContainer = document.getElementById('chat');
 
+// Chat a místnosti
 const roomsList = document.getElementById('roomsList');
 const messagesList = document.getElementById('messagesList');
 const messageForm = document.getElementById('messageForm');
 const messageInput = document.getElementById('messageInput');
 const currentRoomTitle = document.getElementById('currentRoomTitle');
+const backToRoomsBtn = document.getElementById('back-to-rooms-btn');
 
-// Modální okno - Nastavení
+// Modální okno: Nastavení
 const settingsModal = document.getElementById('settings-modal');
 const settingsBtn = document.getElementById('settings-btn');
 const closeSettingsBtn = document.getElementById('close-settings-btn');
 const logoutBtn = document.getElementById('logout-btn');
+const settingsEmailDisplay = document.getElementById('settings-email');
+const settingsUsernameInput = document.getElementById('settings-username-input');
+const saveUsernameBtn = document.getElementById('save-username-btn');
+const colorButtons = document.querySelectorAll('.color-btn');
 
-// Modální okno - Nový chat (➕)
+// Modální okno: Nový chat (➕)
 const addRoomModal = document.getElementById('add-room-modal');
 const addRoomBtn = document.getElementById('add-room-btn');
 const closeAddRoomBtn = document.getElementById('close-add-room-btn');
 const createDmBtn = document.getElementById('create-dm-btn');
 const searchUsernameInput = document.getElementById('search-username-input');
 
+
+/* ===================================================================
+   3. APLIKAČNÍ STAV (STATE)
+================================================================== */
 let currentUser = null;
 let currentRoomId = null;
 let currentSubscription = null;
 let roomsSubscription = null;
 
 
-// --- OTEVÍRÁNÍ A ZAVÍRÁNÍ MODALŮ ---
-settingsBtn.addEventListener('click', () => {
-    settingsModal.classList.remove('hidden');
-});
+/* ===================================================================
+   4. UI SPRÁVA (MODALY A VZHLED)
+================================================================== */
+// Otevírání a zavírání modalů
+settingsBtn?.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+closeSettingsBtn?.addEventListener('click', () => settingsModal.classList.add('hidden'));
 
-closeSettingsBtn.addEventListener('click', () => {
-    settingsModal.classList.add('hidden');
-});
-
-addRoomBtn.addEventListener('click', () => {
+addRoomBtn?.addEventListener('click', () => {
     addRoomModal.classList.remove('hidden');
-    searchUsernameInput.focus();
+    searchUsernameInput?.focus();
 });
 
-closeAddRoomBtn.addEventListener('click', () => {
+closeAddRoomBtn?.addEventListener('click', () => {
     addRoomModal.classList.add('hidden');
-    searchUsernameInput.value = '';
+    if (searchUsernameInput) searchUsernameInput.value = '';
 });
 
 // Zavření modalů kliknutím mimo okno
 window.addEventListener('click', (e) => {
-    if (e.target === settingsModal) {
-        settingsModal.classList.add('hidden');
-    }
-    if (e.target === addRoomModal) {
-        addRoomModal.classList.add('hidden');
-    }
+    if (e.target === settingsModal) settingsModal.classList.add('hidden');
+    if (e.target === addRoomModal) addRoomModal.classList.add('hidden');
+});
+
+// Mobilní tlačítko zpět na seznam místností
+backToRoomsBtn?.addEventListener('click', () => {
+    chatContainer.classList.remove('mobile-chat-open');
 });
 
 
-// --- KONTROLA PŘI STARTU ---
+/* ===================================================================
+   5. AUTENTIFIKACE A SESSION MANAGEMENT
+================================================================== */
 async function checkUserSession() {
-    // Supabase v2 automaticky pošle událost 'INITIAL_SESSION' jakmile prohledá localStorage
     mySupabase.auth.onAuthStateChange((event, session) => {
-        console.log("Auth event:", event); // Tohle nám pomůže při hledání chyb (uvidíš v konzoli F12)
+        console.log("Auth event:", event);
         
         if (session && session.user) {
-            // Pokud už jsme to načetli, nebudeme to dělat znovu
             if (currentUser && currentUser.id === session.user.id) return; 
 
             currentUser = session.user;
@@ -96,30 +111,7 @@ async function checkUserSession() {
     });
 }
 
-// Pomocná funkce, která se postará o zobrazení správné obrazovky
-function handleSessionState(session) {
-    if (session && session.user) {
-        // Pokud už jsme to načetli, nebudeme to načítat znovu
-        if (currentUser && currentUser.id === session.user.id) return; 
-
-        currentUser = session.user;
-        console.log("Uživatel je přihlášený:", currentUser.email);
-        
-        loginContainer.style.display = 'none';
-        chatContainer.style.display = 'flex';
-        
-        loadRooms();
-        setupRealtimeRooms();
-    } else {
-        console.log("Nikdo není přihlášený, zobrazuji login.");
-        currentUser = null;
-        loginContainer.style.display = 'flex';
-        chatContainer.style.display = 'none';
-    }
-}
-
-
-// --- PŘIHLÁŠENÍ / REGISTRACE ---
+// Přihlášení / Registrace
 loginBtn.addEventListener('click', async () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
@@ -137,14 +129,12 @@ loginBtn.addEventListener('click', async () => {
 
     if (error) {
         console.log("Přihlášení selhalo, zkouším registraci...");
-        const username = document.getElementById('uname').value.trim() || email.split('@')[0];
+        const username = document.getElementById('uname')?.value.trim() || email.split('@')[0];
 
         const signUpResult = await mySupabase.auth.signUp({ 
             email, 
             password,
-            options: {
-                data: { username: username }
-            }
+            options: { data: { username: username } }
         });
         data = signUpResult.data;
         error = signUpResult.error;
@@ -164,8 +154,7 @@ loginBtn.addEventListener('click', async () => {
     }
 });
 
-
-// --- ODHLÁŠENÍ ---
+// Odhlášení
 logoutBtn.addEventListener('click', async () => {
     const { error } = await mySupabase.auth.signOut();
     
@@ -196,7 +185,9 @@ logoutBtn.addEventListener('click', async () => {
 });
 
 
-// --- NAČTENÍ MÍSTNOSTÍ Z DATABÁZE ---
+/* ===================================================================
+   6. SPRÁVA MÍSTNOSTÍ (ROOMS)
+================================================================== */
 async function loadRooms() {
     const { data: roomsData, error: roomsError } = await mySupabase
         .from('rooms')
@@ -225,33 +216,6 @@ async function loadRooms() {
     }
 }
 
-// Příklad funkce, která vytvoří HTML bublinu zprávy
-function renderMessage(msg) {
-    // 1. Zpracování času z databáze (převod z ISO formátu na hezký čas HH:MM)
-    let timeString = "";
-    if (msg.created_at) {
-        const date = new Date(msg.created_at);
-        // Formátuje čas na české poměry (např. 14:35)
-        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-
-    // 2. Vytvoření HTML struktury zprávy
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message-bubble');
-    
-    // Pokud chceš rozlišit vlastní zprávy a cizí, můžeš přidat třídu (podle toho, jak to máš pojmenované)
-    // if (msg.username === currentUser) { messageDiv.classList.add('my-message'); }
-
-    messageDiv.innerHTML = `
-        <span class="message-author">${msg.username}</span>
-        <div class="message-text">${msg.text}</div>
-        <span class="message-time">${timeString}</span>
-    `;
-
-    document.getElementById('messagesList').appendChild(messageDiv);
-}
-
-// Pomocná funkce pro vykreslení místnosti s chytrým názvem
 async function renderRoomItem(room) {
     const otherUserId = room.user1_id === currentUser.id ? room.user2_id : room.user1_id;
     
@@ -274,7 +238,6 @@ async function renderRoomItem(room) {
     roomsList.appendChild(roomDiv);
 }
 
-// Pro staré místnosti, které nemají user1/user2 ID
 function renderRoomItemLegacy(room) {
     const roomDiv = document.createElement('div');
     roomDiv.textContent = room.name;
@@ -287,7 +250,7 @@ function renderRoomItemLegacy(room) {
     roomsList.appendChild(roomDiv);
 }
 
-// --- VYTVOŘENÍ NOVÉ MÍSTNOSTI (Tlačítko ➕) ---
+// Vytvoření nového přímého chatu (DM)
 createDmBtn.addEventListener('click', async () => {
     const searchTarget = searchUsernameInput.value.trim();
     
@@ -313,7 +276,7 @@ createDmBtn.addEventListener('click', async () => {
         return;
     }
 
-    const { data: existingRooms, error: checkError } = await mySupabase
+    const { data: existingRooms } = await mySupabase
         .from('rooms')
         .select('*')
         .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${targetUser.id}),and(user1_id.eq.${targetUser.id},user2_id.eq.${currentUser.id})`);
@@ -340,38 +303,26 @@ createDmBtn.addEventListener('click', async () => {
     if (roomError) {
         alert("Chyba při vytváření místnosti: " + roomError.message);
     } else {
-        console.log("Místnost úspěšně vytvořena:", newRoom);
         searchUsernameInput.value = '';
         addRoomModal.classList.add('hidden');
     }
 });
 
-
-// --- VÝBĚR MÍSTNOSTI ---
 function selectRoom(roomId, roomName) {
     currentRoomId = roomId;
     currentRoomTitle.textContent = `Chat: ${roomName}`;
     loadMessagesForRoom(roomId);
     setupRealtimeChat(roomId);
 
-    // Na mobilech po kliknutí na místnost schováme seznam a ukážeme chat
-    const chatWrapper = document.getElementById('chat'); // Nebo ID tvého hlavního chat containeru
     if (window.innerWidth <= 768) {
-        chatWrapper.classList.add('mobile-chat-open');
+        chatContainer.classList.add('mobile-chat-open');
     }
 }
 
-// --- TLAČÍTKO ZPĚT NA MOBILU ---
-const backToRoomsBtn = document.getElementById('back-to-rooms-btn');
-if (backToRoomsBtn) {
-    backToRoomsBtn.addEventListener('click', () => {
-        const chatWrapper = document.getElementById('chat');
-        chatWrapper.classList.remove('mobile-chat-open');
-    });
-}
 
-
-// --- NAČTENÍ ZPRÁV PRO DANOU MÍSTNOST ---
+/* ===================================================================
+   7. SPRÁVA ZPRÁV A CHATU (MESSAGES)
+================================================================== */
 async function loadMessagesForRoom(roomId) {
     const { data, error } = await mySupabase
         .from('messages')
@@ -391,33 +342,11 @@ async function loadMessagesForRoom(roomId) {
         return;
     }
 
-    data.forEach(msg => {
-        // Získání a zformátování času
-        let timeString = "";
-        if (msg.created_at) {
-            const date = new Date(msg.created_at);
-            timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'message-bubble';
-
-        // Přidání času do HTML bubliny
-        msgDiv.innerHTML = `
-            <span class="message-author">${msg.user_email}</span>
-            <div class="message-text">${msg.content}</div>
-            <span class="message-time">${timeString}</span>
-        `;
-        
-        messagesList.appendChild(msgDiv);
-    });
-
-    // Po načtení zpráv odscrollujeme úplně dolů
+    data.forEach(msg => appendMessageBubble(msg));
     messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-
-// --- ODESÍLÁNÍ ZPRÁV ---
+// Odeslání nové zprávy
 messageForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -446,8 +375,32 @@ messageForm.addEventListener('submit', async (e) => {
     }
 });
 
+// Vykreslení jedné zprávové bubliny
+function appendMessageBubble(msg) {
+    let timeString = "";
+    if (msg.created_at) {
+        const date = new Date(msg.created_at);
+        timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+        timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
 
-// --- POSLUCHAČ NA REALTIME ZPRÁVY ---
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message-bubble';
+
+    msgDiv.innerHTML = `
+        <span class="message-author">${msg.user_email}</span>
+        <div class="message-text">${msg.content}</div>
+        <span class="message-time">${timeString}</span>
+    `;
+    
+    messagesList.appendChild(msgDiv);
+}
+
+
+/* ===================================================================
+   8. REALTIME (WEBSOCKETS)
+================================================================== */
 function setupRealtimeChat(roomId) {
     if (currentSubscription) {
         mySupabase.removeChannel(currentSubscription);
@@ -464,39 +417,13 @@ function setupRealtimeChat(roomId) {
                 filter: `room_id=eq.${roomId}`
             },
             (payload) => {
-                const msg = payload.new;
-                
-                // Získání a zformátování času pro novou zprávu
-                let timeString = "";
-                if (msg.created_at) {
-                    const date = new Date(msg.created_at);
-                    timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                } else {
-                    // Záloha: kdyby databáze nestihla čas poslat, vezmeme aktuální z prohlížeče
-                    timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message-bubble';
-
-                // Vykreslení bubliny i s časem
-                msgDiv.innerHTML = `
-                    <span class="message-author">${msg.user_email}</span>
-                    <div class="message-text">${msg.content}</div>
-                    <span class="message-time">${timeString}</span>
-                `;
-                
-                messagesList.appendChild(msgDiv);
-                
-                // Když přijde nová zpráva, odscrollujeme automaticky dolů
+                appendMessageBubble(payload.new);
                 messagesList.scrollTop = messagesList.scrollHeight;
             }
         )
         .subscribe();
 }
 
-
-// --- POSLUCHAČ NA REALTIME MÍSTNOSTI ---
 function setupRealtimeRooms() {
     if (roomsSubscription) {
         mySupabase.removeChannel(roomsSubscription);
@@ -513,11 +440,9 @@ function setupRealtimeRooms() {
             },
             async (payload) => {
                 if (!currentUser) return;
-                
                 const room = payload.new;
                 
                 if (room.user1_id === currentUser.id || room.user2_id === currentUser.id) {
-                    console.log("Nová místnost pro mě v reálném čase:", room);
                     await renderRoomItem(room);
                 }
             }
@@ -525,77 +450,73 @@ function setupRealtimeRooms() {
         .subscribe();
 }
 
-// --- ROZŠÍŘENÉ FUNKCE NASTAVENÍ ---
-const settingsEmailDisplay = document.getElementById('settings-email');
-const settingsUsernameInput = document.getElementById('settings-username-input');
-const saveUsernameBtn = document.getElementById('save-username-btn');
-const colorButtons = document.querySelectorAll('.color-btn');
 
-// 1. Změna hlavní barvy (tohle může být venku, funguje nezávisle)
+/* ===================================================================
+   9. NASTAVENÍ A PERSONALIZACE
+================================================================== */
+// Načtení uložené barvy z LocalStorage při startu
 const savedColor = localStorage.getItem('chatAccentColor');
 if (savedColor) {
     document.documentElement.style.setProperty('--primary', savedColor);
-    if (colorButtons) {
-        colorButtons.forEach(b => {
-            if(b.getAttribute('data-color') === savedColor) b.classList.add('active');
-        });
-    }
-}
-
-if (colorButtons) {
-    colorButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const color = e.target.getAttribute('data-color');
-            document.documentElement.style.setProperty('--primary', color);
-            localStorage.setItem('chatAccentColor', color);
-            
-            colorButtons.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-        });
+    colorButtons.forEach(b => {
+        if (b.getAttribute('data-color') === savedColor) b.classList.add('active');
     });
 }
 
-// 2. Ošetření chybějícího HTML (spustí se jen, když jsi úspěšně vložil nové HTML)
-if (settingsBtn && settingsEmailDisplay && settingsUsernameInput) {
-    settingsBtn.addEventListener('click', async () => {
-        if (currentUser) {
-            settingsEmailDisplay.textContent = currentUser.email;
-            
-            const { data: profile } = await mySupabase
-                .from('profiles')
-                .select('username')
-                .eq('id', currentUser.id)
-                .single();
-                
-            if (profile && profile.username) {
-                settingsUsernameInput.value = profile.username;
-            } else {
-                settingsUsernameInput.value = currentUser.email.split('@')[0];
-            }
-        }
-    });
-}
-
-if (saveUsernameBtn) {
-    saveUsernameBtn.addEventListener('click', async () => {
-        const newUsername = settingsUsernameInput.value.trim();
-        if (!newUsername) return;
-
-        saveUsernameBtn.textContent = "Ukládám...";
+// Přepínání barevných schémat
+colorButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const color = e.target.getAttribute('data-color');
+        document.documentElement.style.setProperty('--primary', color);
+        localStorage.setItem('chatAccentColor', color);
         
-        const { error } = await mySupabase
-            .from('profiles')
-            .update({ username: newUsername })
-            .eq('id', currentUser.id);
-
-        if (error) {
-            alert("Chyba při ukládání jména: " + error.message);
-        } else {
-            saveUsernameBtn.textContent = "Uloženo ✔";
-            setTimeout(() => saveUsernameBtn.textContent = "Uložit", 2000);
-        }
+        colorButtons.forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
     });
-}
+});
 
-// Úplně na konci zavoláme kontrolu (vráceno do původní verze)
+// Načtení údajů do modálního okna nastavení
+settingsBtn?.addEventListener('click', async () => {
+    if (currentUser && settingsEmailDisplay && settingsUsernameInput) {
+        settingsEmailDisplay.textContent = currentUser.email;
+        
+        const { data: profile } = await mySupabase
+            .from('profiles')
+            .select('username')
+            .eq('id', currentUser.id)
+            .single();
+            
+        if (profile && profile.username) {
+            settingsUsernameInput.value = profile.username;
+        } else {
+            settingsUsernameInput.value = currentUser.email.split('@')[0];
+        }
+    }
+});
+
+// Uložení nového uživatelského jména
+saveUsernameBtn?.addEventListener('click', async () => {
+    const newUsername = settingsUsernameInput.value.trim();
+    if (!newUsername) return;
+
+    saveUsernameBtn.textContent = "Ukládám...";
+    
+    const { error } = await mySupabase
+        .from('profiles')
+        .update({ username: newUsername })
+        .eq('id', currentUser.id);
+
+    if (error) {
+        alert("Chyba při ukládání jména: " + error.message);
+        saveUsernameBtn.textContent = "Uložit";
+    } else {
+        saveUsernameBtn.textContent = "Uloženo ✔";
+        setTimeout(() => saveUsernameBtn.textContent = "Uložit", 2000);
+    }
+});
+
+
+/* ===================================================================
+   10. SPUŠTĚNÍ APLIKACE
+================================================================== */
 checkUserSession();
